@@ -27,5 +27,4 @@ See the file tree in the issue or the project description. Core code lives under
 
 ## Notes
 - Use `.env.example` as a template for runtime settings.
-- Dockerfile builds a self‑contained test image.
 - CI runs lint, type‑check, and tests on pushes and PRs.

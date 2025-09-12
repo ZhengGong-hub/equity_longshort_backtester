@@ -1,7 +1,7 @@
 PY = python
 PIP = pip
 
-.PHONY: install lint test format typecheck precommit build docker
+.PHONY: install lint test format typecheck precommit build
 
 install:
 	uv venv || true
@@ -23,7 +23,6 @@ test:
 precommit:
 	pre-commit run --all-files
 
-docker:
-	docker build -t momentum-backtester:dev .
+
 
 
