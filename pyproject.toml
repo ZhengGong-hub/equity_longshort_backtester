@@ -1,0 +1,67 @@
+[project]
+name = "momentum-backtester"
+version = "0.1.0"
+description = "Sector-neutral momentum backtests: typed, tested, reproducible."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Your Name", email = "you@example.com" }]
+keywords = ["finance", "quant", "backtest", "momentum", "portfolio"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: MIT License",
+  "Intended Audience :: Science/Research",
+  "Topic :: Scientific/Engineering",
+]
+
+dependencies = [
+  "pandas>=2.1",
+  "numpy>=1.26",
+  "scipy>=1.11",
+  "requests>=2.31",
+  "pyyaml>=6.0",
+  "tqdm>=4.66",
+  "typing-extensions>=4.8",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=5.0",
+  "mypy>=1.10",
+  "ruff>=0.5.0",
+  "pre-commit>=3.7.0",
+  "jupytext>=1.16.0",
+  "notebook>=7.0",
+]
+
+[project.scripts]
+run-backtest = "momentum_backtester.scripts.run_backtest:main"
+sweep-costs = "momentum_backtester.scripts.sweep_costs:main"
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+addopts = "-q"
+pythonpath = ["src"]
+testpaths = ["tests"]
+
+[tool.coverage.run]
+source = ["momentum_backtester"]
+
+[tool.ruff]
+extend = "ruff.toml"
+
+[tool.mypy]
+explicit_package_bases = true
+ignore_missing_imports = false
+
+
