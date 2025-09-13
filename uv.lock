@@ -11,7 +11,7 @@ resolution-markers = [
 [[package]]
 name = "academic-data-download"
 version = "0.1.0"
-source = { git = "https://github.com/ZhengGong-hub/academic_data_download.git?rev=90978c9763bc457afddab4de4e86e70de11e44f5#90978c9763bc457afddab4de4e86e70de11e44f5" }
+source = { git = "https://github.com/ZhengGong-hub/academic_data_download.git?rev=94c22769256acaeae625c980aa8b0983c66d8c0c#94c22769256acaeae625c980aa8b0983c66d8c0c" }
 dependencies = [
     { name = "fastparquet" },
     { name = "python-dotenv" },
@@ -1339,7 +1339,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "academic-data-download", git = "https://github.com/ZhengGong-hub/academic_data_download.git?rev=90978c9763bc457afddab4de4e86e70de11e44f5" },
+    { name = "academic-data-download", git = "https://github.com/ZhengGong-hub/academic_data_download.git?rev=94c22769256acaeae625c980aa8b0983c66d8c0c" },
     { name = "jupytext", marker = "extra == 'dev'", specifier = ">=1.16.0" },
     { name = "mypy", marker = "extra == 'dev'", specifier = ">=1.10" },
     { name = "notebook", marker = "extra == 'dev'", specifier = ">=7.0" },

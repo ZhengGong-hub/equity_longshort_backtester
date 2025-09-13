@@ -10,13 +10,17 @@ from momentum_backtester.costs import turnover_costs
 def main() -> None:
     data = load_sp500_data_wrds()
     sp500_universes = data["sp500_universes"]
-    ret_df_wide = data["ret_df_wide"]
-    price_df_wide = data["price_df_wide"]
+    retoto_df_wide = data["retoto_df_wide"]
+    retctc_df_wide = data["retctc_df_wide"]
+    adjclose_df_wide = data["adjclose_df_wide"]
+    adjopen_df_wide = data["adjopen_df_wide"]
     sector_df_wide = data["sector_df_wide"]
 
     bt = Backtester(
-        ret_df_wide=ret_df_wide,
-        price_df_wide=price_df_wide,
+        retoto_df_wide=retoto_df_wide,
+        retctc_df_wide=retctc_df_wide,
+        adjclose_df_wide=adjclose_df_wide,
+        adjopen_df_wide=adjopen_df_wide,
         sector_df_wide=sector_df_wide,
         signal=lambda px: close_to_close_momentum(
             px, 

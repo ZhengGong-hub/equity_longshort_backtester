@@ -48,21 +48,28 @@ def load_sp500_data_wrds() -> dict:
     price_df_long = pd.concat(price_df)
     price_df_long['date'] = pd.to_datetime(price_df_long['date'])
     price_df_long['adjclose'] = price_df_long['prc'] / price_df_long['cfacpr']
-    print(price_df_long.query("gvkey == '001690'").head())
+    price_df_long['adjopen'] = price_df_long['openprc'] / price_df_long['cfacpr']
+    price_df_long['ret_oto'] = price_df_long.groupby('permno')['adjopen'].transform(lambda x: x.pct_change())
 
-    ret_df_wide = price_df_long.pivot(index="date", columns="permno", values="ret")
-    price_df_wide = price_df_long.pivot(index="date", columns="permno", values="adjclose")
+    retoto_df_wide = price_df_long.pivot(index="date", columns="permno", values="ret_oto")
+    retctc_df_wide = price_df_long.pivot(index="date", columns="permno", values="ret")
+    adjclose_df_wide = price_df_long.pivot(index="date", columns="permno", values="adjclose")
+    adjopen_df_wide = price_df_long.pivot(index="date", columns="permno", values="adjopen")
     sector_df_wide = price_df_long.pivot(index="date", columns="permno", values="gsector")
 
     # final ffill 
-    ret_df_wide = ret_df_wide.ffill(limit = 5)
-    price_df_wide = price_df_wide.ffill(limit = 5)
+    retoto_df_wide = retoto_df_wide.ffill(limit = 5)
+    retctc_df_wide = retctc_df_wide.ffill(limit = 5)
+    adjclose_df_wide = adjclose_df_wide.ffill(limit = 5)
+    adjopen_df_wide = adjopen_df_wide.ffill(limit = 5)
     sector_df_wide = sector_df_wide.ffill(limit = 5)
 
     return {
         "sp500_universes": sp500_universes,
         "price_df_long": price_df_long,
-        "ret_df_wide": ret_df_wide,
-        "price_df_wide": price_df_wide,
+        "retoto_df_wide": retoto_df_wide,
+        "retctc_df_wide": retctc_df_wide,
+        "adjclose_df_wide": adjclose_df_wide,
+        "adjopen_df_wide": adjopen_df_wide,
         "sector_df_wide": sector_df_wide
     }

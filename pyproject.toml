@@ -23,7 +23,7 @@ dependencies = [
   "tqdm>=4.66",
   "typing-extensions>=4.8",
   "wrds==3.4.0",
-  "academic_data_download @ git+https://github.com/ZhengGong-hub/academic_data_download.git@90978c9763bc457afddab4de4e86e70de11e44f5"
+  "academic_data_download @ git+https://github.com/ZhengGong-hub/academic_data_download.git@94c22769256acaeae625c980aa8b0983c66d8c0c"
 ]
 
 [project.optional-dependencies]
