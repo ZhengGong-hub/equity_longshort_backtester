@@ -3,23 +3,66 @@ from __future__ import annotations
 from dataclasses import dataclass
 import pandas as pd
 
+from academic_data_download.db_manager.wrds_sql import get_sp500_constituents_snapshot, get_crsp_daily_by_permno_by_year
+from academic_data_download.utils.wrds_connect import connect_wrds
+import os
+import dotenv
+dotenv.load_dotenv()
+
 
 @dataclass
 class SP500Universe:
-    prices: pd.DataFrame
-    sectors: pd.DataFrame
-    universe: pd.DataFrame
+    year: int
+    gvkeys: list[str]
+    permnos: list[str]
 
-
+# TODO: implement this
 def load_tiny_sample() -> SP500Universe:
-    """Placeholder tiny dataset loader. Real impl could fetch from GitHub.
-
-    For tests, we expect CSVs in tests/data.
     """
-    base = "tests/data"
-    prices = pd.read_csv(f"{base}/tiny_prices.csv", parse_dates=[0], index_col=0)
-    sectors = pd.read_csv(f"{base}/tiny_sectors.csv", index_col=0)
-    universe = pd.read_csv(f"{base}/tiny_universe.csv", index_col=0)
-    return SP500Universe(prices=prices, sectors=sectors, universe=universe)
+    Placeholder tiny dataset loader. Real impl could fetch from wrds.
+    """
+    pass
 
 
+def load_sp500_data_wrds() -> dict:
+    print("Loading SP500 data...")
+    db = connect_wrds(username=os.getenv("WRDS_USERNAME"), password=os.getenv("WRDS_PASSWORD"))
+    sp500_universes = []
+    price_df = []
+    for year in range(2020, 2022):
+        print(f"Loading SP500 data for year {year}...")
+        constituents = get_sp500_constituents_snapshot(db, year)[['gvkey', 'permno', 'gsector']]
+        print(f"the number of unique permnos for year {year} is {len(constituents['permno'].unique())}")
+        print(f"the number of unique gvkeys for year {year} is {len(constituents['gvkey'].unique())}")
+        crsp_daily = get_crsp_daily_by_permno_by_year(db, constituents["permno"].unique(), year)
+        crsp_daily = pd.merge(crsp_daily, constituents, on="permno", how="left")
+        crsp_daily['permno'] = crsp_daily['permno'].astype(str) # convert permno to string for easier querying
+
+        price_df.append(crsp_daily)
+        sp500_universes.append(
+            SP500Universe(
+                year=year, 
+                gvkeys=constituents["gvkey"].unique(), 
+                permnos=constituents["permno"].unique(), 
+                ))
+    price_df_long = pd.concat(price_df)
+    price_df_long['date'] = pd.to_datetime(price_df_long['date'])
+    price_df_long['adjclose'] = price_df_long['prc'] / price_df_long['cfacpr']
+    print(price_df_long.query("gvkey == '001690'").head())
+
+    ret_df_wide = price_df_long.pivot(index="date", columns="permno", values="ret")
+    price_df_wide = price_df_long.pivot(index="date", columns="permno", values="adjclose")
+    sector_df_wide = price_df_long.pivot(index="date", columns="permno", values="gsector")
+
+    # final ffill 
+    ret_df_wide = ret_df_wide.ffill(limit = 5)
+    price_df_wide = price_df_wide.ffill(limit = 5)
+    sector_df_wide = sector_df_wide.ffill(limit = 5)
+
+    return {
+        "sp500_universes": sp500_universes,
+        "price_df_long": price_df_long,
+        "ret_df_wide": ret_df_wide,
+        "price_df_wide": price_df_wide,
+        "sector_df_wide": sector_df_wide
+    }

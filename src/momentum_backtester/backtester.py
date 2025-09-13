@@ -14,50 +14,47 @@ RankFunc = Callable[[pd.DataFrame], pd.DataFrame]
 AggFunc = Callable[[pd.DataFrame, pd.DataFrame], pd.DataFrame]
 CostFunc = Callable[[pd.DataFrame, pd.DataFrame], pd.Series]
 
-
-@dataclass
-class BacktestConfig:
-    rebalance: str = "M"  # month-end
-    top_n: int = 50
-    bottom_n: int = 50
-    long_short: bool = True
-
-
 class Backtester:
     def __init__(
         self,
-        prices: pd.DataFrame,
-        sectors: pd.DataFrame,
-        universe: pd.DataFrame,
+        ret_df_wide: pd.DataFrame,
+        price_df_wide: pd.DataFrame,
+        sector_df_wide: pd.DataFrame,
         signal: SignalFunc,
         ranker: RankFunc,
         aggregator: AggFunc,
         costs: CostFunc,
-        config: BacktestConfig | None = None,
+        rebal_freq: str = "M",
     ) -> None:
-        self.prices = prices.sort_index()
-        self.sectors = sectors
-        self.universe = universe
+        self.ret_df_wide = ret_df_wide.sort_index()
+        self.price_df_wide = price_df_wide.sort_index()
+        self.sector_df_wide = sector_df_wide.sort_index()
         self.signal = signal
         self.ranker = ranker
         self.aggregator = aggregator
         self.costs = costs
-        self.config = config or BacktestConfig()
         self.calendar = MonthEndCalendar()
+        self.rebal_freq = rebal_freq
 
     def run(self) -> Dict[str, pd.DataFrame | pd.Series]:
-        px = self.prices.loc[:, self.prices.columns.intersection(self.universe.columns)]
-        px = px.ffill()
-        rebal_dates = self.calendar.month_ends(px.index)
+        if self.rebal_freq == "D":
+            rebal_dates = self.calendar.day_ends(self.ret_df_wide.index)
+        elif self.rebal_freq == "M":
+            rebal_dates = self.calendar.month_ends(self.ret_df_wide.index)
+        else:
+            raise ValueError(f"Invalid rebalance frequency: {self.rebal_freq}")
+        # print(rebal_dates)
 
-        signals = self.signal(px)
+        signals = self.signal(self.price_df_wide)
+        # print(signals.tail())
+
         ranks = self.ranker(signals.loc[rebal_dates])
+        # print(ranks.tail())
 
-        weights = self.aggregator(ranks, self.sectors)
+        weights = self.aggregator(ranks, self.sector_df_wide)
         weights = weights.reindex(rebal_dates).fillna(0.0)
 
-        rets = px.pct_change().fillna(0.0)
-        port_rets = (weights.shift().reindex(rets.index).fillna(0.0) * rets).sum(axis=1)
+        port_rets = (weights.shift().reindex(self.ret_df_wide.index).fillna(0.0) * self.ret_df_wide).sum(axis=1)
 
         tc = self.costs(weights)
         net_rets = port_rets - tc.reindex(port_rets.index).fillna(0.0)

@@ -10,4 +10,8 @@ class MonthEndCalendar:
         month_end_flags = index.to_series().groupby([index.year, index.month]).tail(1)
         return pd.DatetimeIndex(month_end_flags.index)
 
-
+    def day_ends(self, index: pd.Index) -> pd.DatetimeIndex:
+        if not isinstance(index, pd.DatetimeIndex):
+            index = pd.DatetimeIndex(index)
+        day_end_flags = index.to_series()
+        return pd.DatetimeIndex(day_end_flags.index)
