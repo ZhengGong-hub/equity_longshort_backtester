@@ -33,6 +33,13 @@ def main() -> None:
     )
     results = bt.run()
     print(results)
-
+    summary = {
+        "start": results["net_returns"].index.min(),
+        "end": results["net_returns"].index.max(),
+        "n_days": int(results["net_returns"].shape[0]),
+        "cum_return": float((1 + results["net_returns"]).prod() - 1.0),
+    }
+    print(summary)
+    
 if __name__ == "__main__":
     main()
