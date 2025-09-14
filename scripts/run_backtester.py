@@ -6,9 +6,10 @@ from momentum_backtester.signals import price_momentum
 from momentum_backtester.ranking import cross_sectional_rank
 from momentum_backtester.aggregation import long_short_top_bottom_sector_neutral
 from momentum_backtester.costs import turnover_costs
+from momentum_backtester.analysis import Analysis
 
 def main() -> None:
-    data = load_sp500_data_wrds()
+    data = load_sp500_data_wrds(start_year=2020, end_year=2023)
     sp500_universes = data["sp500_universes"]
     retoto_df_wide = data["retoto_df_wide"]
     retctc_df_wide = data["retctc_df_wide"]
@@ -32,7 +33,7 @@ def main() -> None:
             sectors, 
             top_pctg=20, 
             bottom_pctg=20),
-        costs=lambda w: turnover_costs(w, 20.0),
+        costs=lambda w: turnover_costs(w, 10.0),
         rebal_freq="M",
     )
     results = bt.run()
@@ -44,6 +45,17 @@ def main() -> None:
         "cum_return": float((1 + results["net_returns"]).prod() - 1.0),
     }
     print(summary)
-    
+
+    # start analysis
+    # Analysis.cagr(results["net_returns"], 252)
+    # Analysis.annual_vol(results["net_returns"], 252)
+    # Analysis.sharpe(results["net_returns"], 0.04, 252)
+    # Analysis.max_drawdown(results["net_returns"])
+    # Analysis.nav_chart(results["gross_returns"], results["net_returns"], incl_spy=True, spy_daily=data["spy_daily"])
+    # Analysis.spy_chart(data["spy_daily"])
+    # Analysis.against_spy(results["net_returns"], data["spy_daily"])
+    # Analysis.rolling_beta(results["net_returns"], data["spy_daily"])
+    # Analysis.return_attr_sector(results["weights"], data["sector_df_wide"], results["retoto_df_wide"], results["gross_returns"])
+    Analysis.total_turnover(results["weights"])
 if __name__ == "__main__":
     main()

@@ -7,6 +7,9 @@ from academic_data_download.db_manager.wrds_sql import get_sp500_constituents_sn
 from academic_data_download.utils.wrds_connect import connect_wrds
 import os
 import dotenv
+import warnings
+
+warnings.filterwarnings("ignore")
 dotenv.load_dotenv()
 
 
@@ -24,12 +27,22 @@ def load_tiny_sample() -> SP500Universe:
     pass
 
 
-def load_sp500_data_wrds() -> dict:
+def load_sp500_data_wrds(start_year: int, end_year: int) -> dict:
     print("Loading SP500 data...")
     db = connect_wrds(username=os.getenv("WRDS_USERNAME"), password=os.getenv("WRDS_PASSWORD"))
+
+    # get spy 
+    spy_daily = get_crsp_daily_by_permno_by_year(db, ["84398"], 'all')
+    spy_daily = spy_daily.query(f"date >= '{start_year}-01-01' and date <= '{end_year}-12-31'")
+    spy_daily['date'] = pd.to_datetime(spy_daily['date'])
+    spy_daily['adjclose'] = spy_daily['prc'] / spy_daily['cfacpr']
+    spy_daily['adjopen'] = spy_daily['openprc'] / spy_daily['cfacpr']
+    spy_daily['ret_oto'] = spy_daily.groupby('permno')['adjopen'].transform(lambda x: x.pct_change())
+    spy_daily['nav'] = (1.0 + spy_daily['ret'].shift(-1)).cumprod()
+
     sp500_universes = []
     price_df = []
-    for year in range(2020, 2022):
+    for year in range(start_year, end_year+1):
         print(f"Loading SP500 data for year {year}...")
         constituents = get_sp500_constituents_snapshot(db, year)[['gvkey', 'permno', 'gsector']]
         print(f"the number of unique permnos for year {year} is {len(constituents['permno'].unique())}")
@@ -78,5 +91,8 @@ def load_sp500_data_wrds() -> dict:
         "adjclose_df_wide": adjclose_df_wide,
         "adjopen_df_wide": adjopen_df_wide,
         # wide format: sector
-        "sector_df_wide": sector_df_wide
+        "sector_df_wide": sector_df_wide,
+
+        # supportive data 
+        "spy_daily": spy_daily
     }

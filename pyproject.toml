@@ -23,7 +23,8 @@ dependencies = [
   "tqdm>=4.66",
   "typing-extensions>=4.8",
   "wrds==3.4.0",
-  "academic_data_download @ git+https://github.com/ZhengGong-hub/academic_data_download.git@94c22769256acaeae625c980aa8b0983c66d8c0c"
+  "academic_data_download @ git+https://github.com/ZhengGong-hub/academic_data_download.git@aa260541cb06e5da7de77ead2c4bcc3b3e80ac10",
+  "matplotlib"
 ]
 
 [project.optional-dependencies]

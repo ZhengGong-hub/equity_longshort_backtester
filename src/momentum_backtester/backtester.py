@@ -5,6 +5,8 @@ from typing import Callable, Dict, Tuple
 
 import numpy as np
 import pandas as pd
+import warnings
+warnings.filterwarnings("ignore")
 
 from .utils import MonthEndCalendar
 
@@ -56,9 +58,10 @@ class Backtester:
         # print(ranks.tail())
 
         weights = self.aggregator(ranks, self.sector_df_wide)
-        print(weights.tail())
+        weights = weights.reindex(self.retoto_df_wide.index).ffill().fillna(0.0)
+        # print(weights.tail())
 
-        port_rets = (weights.reindex(self.retoto_df_wide.index).ffill().fillna(0.0) * self.retoto_df_wide.shift(-1)).sum(axis=1)
+        port_rets = (weights * self.retoto_df_wide.shift(-1)).sum(axis=1)
 
         tc = self.costs(weights)
         net_rets = port_rets - tc.reindex(port_rets.index).fillna(0.0)
@@ -72,6 +75,8 @@ class Backtester:
             "transaction_costs": tc,
             "net_returns": net_rets,
             "equity": equity,
+            # raw input
+            "retoto_df_wide": self.retoto_df_wide,
         }
 
 
