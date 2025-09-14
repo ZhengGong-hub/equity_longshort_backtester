@@ -11,20 +11,18 @@ Sector‑neutral momentum backtests built the right way: typed, tested, reproduc
 
 ## Quickstart
 ```bash
-# 1) Install tooling
-uv venv && uv pip install -e .[dev]
-pre-commit install
 
-# 2) Run tests
-pytest -q
-
-# 3) Run a backtest (tiny data)
+# Run a backtest (tiny data)
 python scripts/run_backtest.py
 ```
 
-## Repo layout
-See the file tree in the issue or the project description. Core code lives under `src/momentum_backtester`.
+## structure of backtester
 
-## Notes
-- Use `.env.example` as a template for runtime settings.
-- CI runs lint, type‑check, and tests on pushes and PRs.
+- 1: get rebalancing date
+- 2: get signal -> save signal file
+    in the signal file, the date represents at the starting of date, the signal file is already accessible.
+
+# TODO:
+- make it more general
+- incorporate fundamentals data 
+- need to do robust testing with dummy file, to make sure that the shift() is done all correctly.

@@ -25,3 +25,39 @@ def long_short_top_bottom(
     return weights
 
 
+def long_short_top_bottom_sector_neutral(
+    ranks: pd.DataFrame,
+    sectors: pd.DataFrame,
+    top_pctg: int = 20,
+    bottom_pctg: int = 20,
+) -> pd.DataFrame:
+    weights = pd.DataFrame(0.0, index=ranks.index, columns=ranks.columns)
+    for date, row in ranks.iterrows():
+        valid = row.dropna()
+        if valid.empty:
+            continue
+        w = pd.Series(0.0, index=row.index)
+
+        sector_date = sectors.loc[date]
+        sector_stats = sector_date.value_counts()
+
+        top, bot = [], []
+        for sector in sector_stats.index:
+            valid_names = valid[sector_date == sector]
+
+            nsmallest = int(top_pctg/100 * len(valid_names))
+            nlargest = int(bottom_pctg/100 * len(valid_names))
+
+            top.append(valid_names.nsmallest(nsmallest))
+            bot.append(valid_names.nlargest(nlargest))
+
+        top = pd.concat(top)
+        bot = pd.concat(bot)
+
+        if len(top) > 0:
+            w.loc[top.index] = 1.0 / len(top)
+        if len(bot) > 0:
+            w.loc[bot.index] = -1.0 / len(bot)
+        weights.loc[date] = w
+
+    return weights

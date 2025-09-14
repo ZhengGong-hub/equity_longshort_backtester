@@ -66,10 +66,17 @@ def load_sp500_data_wrds() -> dict:
 
     return {
         "sp500_universes": sp500_universes,
+        
+        # long format
         "price_df_long": price_df_long,
+
+        # wide format: return, open-to-open, close-to-close
         "retoto_df_wide": retoto_df_wide,
         "retctc_df_wide": retctc_df_wide,
+
+        # wide format: price adjusted
         "adjclose_df_wide": adjclose_df_wide,
         "adjopen_df_wide": adjopen_df_wide,
+        # wide format: sector
         "sector_df_wide": sector_df_wide
     }

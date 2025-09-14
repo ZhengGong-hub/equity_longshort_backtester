@@ -56,9 +56,9 @@ class Backtester:
         # print(ranks.tail())
 
         weights = self.aggregator(ranks, self.sector_df_wide)
-        weights = weights.reindex(rebal_dates).fillna(0.0)
+        print(weights.tail())
 
-        port_rets = (weights.shift().reindex(self.retctc_df_wide.index).fillna(0.0) * self.retctc_df_wide).sum(axis=1)
+        port_rets = (weights.reindex(self.retoto_df_wide.index).ffill().fillna(0.0) * self.retoto_df_wide.shift(-1)).sum(axis=1)
 
         tc = self.costs(weights)
         net_rets = port_rets - tc.reindex(port_rets.index).fillna(0.0)

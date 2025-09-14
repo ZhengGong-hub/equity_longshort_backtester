@@ -2,9 +2,9 @@ import pandas as pd
 
 from momentum_backtester.adapters.sp500_github_adapter import load_tiny_sample, load_sp500_data_wrds
 from momentum_backtester.backtester import Backtester
-from momentum_backtester.signals import close_to_close_momentum
+from momentum_backtester.signals import price_momentum
 from momentum_backtester.ranking import cross_sectional_rank
-from momentum_backtester.aggregation import long_short_top_bottom
+from momentum_backtester.aggregation import long_short_top_bottom_sector_neutral
 from momentum_backtester.costs import turnover_costs
 
 def main() -> None:
@@ -22,17 +22,17 @@ def main() -> None:
         adjclose_df_wide=adjclose_df_wide,
         adjopen_df_wide=adjopen_df_wide,
         sector_df_wide=sector_df_wide,
-        signal=lambda px: close_to_close_momentum(
+        signal=lambda px: price_momentum(
             px, 
-            lookback_days=2, 
+            lookback_months=11, 
             skip=1),
         ranker=cross_sectional_rank,
-        aggregator=lambda ranks, sectors: long_short_top_bottom(
+        aggregator=lambda ranks, sectors: long_short_top_bottom_sector_neutral(
             ranks, 
             sectors, 
-            top_n=50, 
-            bottom_n=50),
-        costs=lambda w: turnover_costs(w, 0.0),
+            top_pctg=20, 
+            bottom_pctg=20),
+        costs=lambda w: turnover_costs(w, 20.0),
         rebal_freq="M",
     )
     results = bt.run()
