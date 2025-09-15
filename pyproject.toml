@@ -1,18 +1,12 @@
 [project]
 name = "momentum-backtester"
 version = "0.1.0"
-description = "Sector-neutral momentum backtests: typed, tested, reproducible."
+description = "Sector-neutral momentum backtester. Aim to be a general backtester for equity, long/ longshort."
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "MIT" }
-authors = [{ name = "Your Name", email = "you@example.com" }]
+authors = [{ name = "GZ", email = "zheng.gong94@gmail.com" }]
 keywords = ["finance", "quant", "backtest", "momentum", "portfolio"]
-classifiers = [
-  "Programming Language :: Python :: 3",
-  "License :: OSI Approved :: MIT License",
-  "Intended Audience :: Science/Research",
-  "Topic :: Scientific/Engineering",
-]
 
 dependencies = [
   "pandas>=2.1",
@@ -65,6 +59,3 @@ extend = "ruff.toml"
 
 [tool.mypy]
 explicit_package_bases = true
-ignore_missing_imports = false
-
-
