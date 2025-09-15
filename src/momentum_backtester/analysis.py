@@ -38,8 +38,8 @@ class Analysis:
         r = returns.dropna() - risk_free / periods_per_year
         vol = self.annual_vol(r, periods_per_year, verbose=False)
         if vol == 0:
-            return 0.0
-        sharpe = round(r.mean() * periods_per_year / vol, 4)
+            return np.nan
+        sharpe = round(r.sum() / vol, 4)
         print("the Sharpe ratio is: ", sharpe)
         return sharpe
 
@@ -170,6 +170,7 @@ class Analysis:
         sector_df_wide: pd.DataFrame,
         retoto_df_wide: pd.DataFrame,
         gross_returns: pd.Series,
+        verbose: bool = True,
     ) -> None:
         """
         Compute return attribution by sector.
@@ -200,7 +201,8 @@ class Analysis:
         # print(sector_ret_df)
 
         total_sector_ret_df = sector_ret_df.sum(axis=0)
-        print(total_sector_ret_df)
+        if verbose:
+            print(total_sector_ret_df)
         return total_sector_ret_df
 
 
@@ -227,4 +229,4 @@ class Analysis:
         total_turnover_per_annum = total_turnover.resample('Y').sum()
         if verbose:
             print("the total turnover per annum is: ", total_turnover_per_annum)
-        return total_turnover
+        return total_turnover_per_annum
