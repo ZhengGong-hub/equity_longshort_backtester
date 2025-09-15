@@ -82,6 +82,24 @@ class Analysis:
 
         # Drawdown chart
         ax2.plot(drawdown, color="red", label="Drawdown (Net)")
+
+        # Add dashed line at the date of maximum drawdown
+        mdd_idx = drawdown.idxmin()
+        mdd_val = drawdown.min()
+        if pd.notnull(mdd_idx):
+            ax2.axvline(mdd_idx, color="black", linestyle="--", alpha=0.7, label="MDD Date")
+            ax2.scatter(mdd_idx, mdd_val, color="black", zorder=5)
+            # Optionally annotate
+            ax2.annotate(
+                f"MDD: {mdd_val:.2%}",
+                xy=(mdd_idx, mdd_val),
+                xytext=(10, -10),
+                textcoords="offset points",
+                arrowprops=dict(arrowstyle="->", color="black"),
+                fontsize=10,
+                color="black"
+            )
+
         ax2.set_ylabel("Drawdown")
         ax2.set_xlabel("Date")
         ax2.set_title("Drawdown")

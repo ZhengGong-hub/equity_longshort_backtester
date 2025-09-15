@@ -9,7 +9,7 @@ from momentum_backtester.costs import turnover_costs
 from momentum_backtester.analysis import Analysis
 
 def main() -> None:
-    data = load_sp500_data_wrds(start_year=2009, end_year=2024)
+    data = load_sp500_data_wrds(start_year=2022, end_year=2024)
     sp500_universes = data["sp500_universes"]
     retoto_df_wide = data["retoto_df_wide"]
     retctc_df_wide = data["retctc_df_wide"]
