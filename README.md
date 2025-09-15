@@ -28,3 +28,4 @@ python scripts/run_backtest.py
 - need to do robust testing with dummy file, to make sure that the shift() is done all correctly.
 - overlay with macro: i.e. risk-free rate
 - plot should follow a certain style
+- ruff, mypy, makefile

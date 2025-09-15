@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,8 +9,11 @@ import warnings
 warnings.filterwarnings("ignore")
 
 class Analysis:
-    @staticmethod
-    def cagr(returns: pd.Series, periods_per_year: int = 252) -> float:
+    def __init__(self, output_dir: str = "output"):
+        self.output_dir = output_dir
+        os.makedirs(self.output_dir, exist_ok=True)
+    
+    def cagr(self, returns: pd.Series, periods_per_year: int = 252) -> float:
         r = returns.dropna()
         if r.empty:
             return 0.0
@@ -21,8 +25,7 @@ class Analysis:
         print("the CAGR is: ", cagr)
         return cagr
 
-    @staticmethod
-    def annual_vol(returns: pd.Series, periods_per_year: int = 252, verbose: bool = True) -> float:
+    def annual_vol(self, returns: pd.Series, periods_per_year: int = 252, verbose: bool = True) -> float:
         r = returns.dropna()
         if r.empty:
             return 0.0
@@ -31,18 +34,16 @@ class Analysis:
             print("the annual volatility is: ", vol)
         return vol
 
-    @staticmethod
-    def sharpe(returns: pd.Series, risk_free: float = 0.0, periods_per_year: int = 252) -> float:
+    def sharpe(self, returns: pd.Series, risk_free: float = 0.0, periods_per_year: int = 252) -> float:
         r = returns.dropna() - risk_free / periods_per_year
-        vol = Analysis.annual_vol(r, periods_per_year, verbose=False)
+        vol = self.annual_vol(r, periods_per_year, verbose=False)
         if vol == 0:
             return 0.0
         sharpe = round(r.mean() * periods_per_year / vol, 4)
         print("the Sharpe ratio is: ", sharpe)
         return sharpe
 
-    @staticmethod
-    def max_drawdown(returns: pd.Series) -> float:
+    def max_drawdown(self, returns: pd.Series) -> float:
         equity = (1.0 + returns.fillna(0.0)).cumprod()
         rolling_max = equity.cummax()
         drawdown = equity / rolling_max - 1.0
@@ -50,8 +51,8 @@ class Analysis:
         print("the maximum drawdown is: ", max_drawdown)
         return max_drawdown
 
-    @staticmethod
     def nav_chart(
+        self,
         gross_returns: pd.Series, 
         net_returns: pd.Series,
         incl_spy: bool = False,
@@ -88,22 +89,19 @@ class Analysis:
         ax2.grid(True, linestyle="--", alpha=0.5)
 
         plt.tight_layout()
-        plt.savefig("nav_chart.png")
-        plt.show()
+        plt.savefig(os.path.join(self.output_dir, "nav_chart.png"))
 
-    @staticmethod
-    def spy_chart(spy_daily: pd.DataFrame) -> None:
+    def spy_chart(self, spy_daily: pd.DataFrame) -> None:
         plt.figure(figsize=(10, 6))
         plt.plot(spy_daily['date'], spy_daily['adjclose'])
         plt.title("SPY Chart")
         plt.xlabel("Date")
         plt.ylabel("Price")
-        plt.savefig("spy_chart.png")
-        plt.show()
+        plt.savefig(os.path.join(self.output_dir, "spy_chart.png"))
 
     
-    @staticmethod
     def against_spy(
+        self,
         net_returns: pd.Series,
         spy_daily: pd.DataFrame,
         verbose: bool = True,
@@ -141,11 +139,12 @@ class Analysis:
             print(res_dict)
         return res_dict
         
-    @staticmethod
     def rolling_beta(
+            self,
             net_returns: pd.Series, 
             spy_daily: pd.DataFrame, 
-            window: int = 252) -> None:
+            window: int = 252,
+        ) -> None:
         """
 
         """
@@ -162,12 +161,11 @@ class Analysis:
         plt.ylabel("Beta")
         plt.legend()
         plt.grid(True, linestyle="--", alpha=0.6)
-        plt.show()
-        plt.savefig("rolling_beta.png")
+        plt.savefig(os.path.join(self.output_dir, "rolling_beta.png"))
     
 
-    @staticmethod
     def return_attr_sector(
+        self,
         weights: pd.DataFrame,
         sector_df_wide: pd.DataFrame,
         retoto_df_wide: pd.DataFrame,
@@ -206,8 +204,8 @@ class Analysis:
         return total_sector_ret_df
 
 
-    @staticmethod
     def total_turnover(
+        self,
         weights: pd.DataFrame,
         verbose: bool = True,
     ) -> pd.Series:
@@ -224,8 +222,7 @@ class Analysis:
         plt.ylabel("Turnover")
         plt.legend()
         plt.grid(True, linestyle="--", alpha=0.6)
-        plt.show()
-        plt.savefig("total_turnover.png")
+        plt.savefig(os.path.join(self.output_dir, "total_turnover.png"))
 
         total_turnover_per_annum = total_turnover.resample('Y').sum()
         if verbose:

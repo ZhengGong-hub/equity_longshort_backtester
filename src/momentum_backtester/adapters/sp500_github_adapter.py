@@ -63,6 +63,9 @@ def load_sp500_data_wrds(start_year: int, end_year: int) -> dict:
     price_df_long['adjclose'] = price_df_long['prc'] / price_df_long['cfacpr']
     price_df_long['adjopen'] = price_df_long['openprc'] / price_df_long['cfacpr']
     price_df_long['ret_oto'] = price_df_long.groupby('permno')['adjopen'].transform(lambda x: x.pct_change())
+    # we drop duplicates of permno on the same date (it happens in 2013 only)
+    price_df_long.drop_duplicates(subset=["date", "permno"], keep=False, inplace=True)
+
 
     retoto_df_wide = price_df_long.pivot(index="date", columns="permno", values="ret_oto")
     retctc_df_wide = price_df_long.pivot(index="date", columns="permno", values="ret")
