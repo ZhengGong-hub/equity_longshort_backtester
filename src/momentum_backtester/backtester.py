@@ -14,7 +14,7 @@ from .utils import MonthEndCalendar
 SignalFunc = Callable[[pd.DataFrame], pd.DataFrame]
 RankFunc = Callable[[pd.DataFrame], pd.DataFrame]
 AggFunc = Callable[[pd.DataFrame, pd.DataFrame], pd.DataFrame]
-CostFunc = Callable[[pd.DataFrame, pd.DataFrame], pd.Series]
+CostFunc = Callable[[pd.DataFrame], pd.Series]
 
 class Backtester:
     def __init__(

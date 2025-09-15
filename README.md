@@ -10,10 +10,12 @@ Sector‑neutral momentum backtests built the right way: typed, tested, reproduc
 - Reproducible runs (fixed calendar, pinned deps, Docker image).
 
 ## Quickstart
+
+- provide in .env token to WRDS database
 ```bash
 
 # Run a backtest (tiny data)
-python scripts/run_backtest.py
+python scripts/run_backtester.py
 ```
 
 ## structure of backtester
@@ -21,6 +23,7 @@ python scripts/run_backtest.py
 - 1: get rebalancing date
 - 2: get signal -> save signal file
     in the signal file, the date represents at the starting of date, the signal file is already accessible.
+- 3: get rank -> aggregate rank to get weights (this part should be further generalized)
 
 # Reflections:
 - I implemented the strategy in the classic setting as specified in the sheet. I did not have the time to fine tune any parameters, but the function class is written in such a way that it should be grid-searchable.
