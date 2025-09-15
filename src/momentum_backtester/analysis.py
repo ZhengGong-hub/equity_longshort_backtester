@@ -13,7 +13,7 @@ class Analysis:
         self.output_dir = output_dir
         os.makedirs(self.output_dir, exist_ok=True)
     
-    def cagr(self, returns: pd.Series, periods_per_year: int = 252) -> float:
+    def cagr(self, returns: pd.Series, periods_per_year: int = 252, verbose: bool = True) -> float:
         r = returns.dropna()
         if r.empty:
             return 0.0
@@ -22,7 +22,8 @@ class Analysis:
         if years <= 0:
             return 0.0
         cagr = round(total_return ** (1.0 / years) - 1.0, 4)
-        print("the CAGR is: ", cagr)
+        if verbose:
+            print("the CAGR is: ", cagr)
         return cagr
 
     def annual_vol(self, returns: pd.Series, periods_per_year: int = 252, verbose: bool = True) -> float:
@@ -34,21 +35,23 @@ class Analysis:
             print("the annual volatility is: ", vol)
         return vol
 
-    def sharpe(self, returns: pd.Series, risk_free: float = 0.0, periods_per_year: int = 252) -> float:
+    def sharpe(self, returns: pd.Series, risk_free: float = 0.0, periods_per_year: int = 252, verbose: bool = True) -> float:
         r = returns.dropna() - risk_free / periods_per_year
         vol = self.annual_vol(r, periods_per_year, verbose=False)
         if vol == 0:
             return np.nan
         sharpe = round(r.sum() / vol, 4)
-        print("the Sharpe ratio is: ", sharpe)
+        if verbose:
+            print("the Sharpe ratio is: ", sharpe)
         return sharpe
 
-    def max_drawdown(self, returns: pd.Series) -> float:
+    def max_drawdown(self, returns: pd.Series, verbose: bool = True) -> float:
         equity = (1.0 + returns.fillna(0.0)).cumprod()
         rolling_max = equity.cummax()
         drawdown = equity / rolling_max - 1.0
         max_drawdown = round(float(drawdown.min()), 4)
-        print("the maximum drawdown is: ", max_drawdown)
+        if verbose:
+            print("the maximum drawdown is: ", max_drawdown)
         return max_drawdown
 
     def nav_chart(

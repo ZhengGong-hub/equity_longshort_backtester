@@ -32,7 +32,7 @@ python scripts/run_backtester.py
 - The strategy does not work well at its current setting, reasons could be multi-faceted: 
 - infra high level: dockerize, deploy on AWS/Azure, crontab or airflow to run it daily. Useful intermediate results should be saved in a db or simply local fs.
 - on coding level: have mypy, linter, CI flow, pytest to ensure compilability and coding standard. Separate test env and prod env. 
-- if possible: do not fetch data directly from the source popping into the backtester, instead we should first save the data locally and let the backetester fetch from locally. In this way, we maintain raw_input_db, backtester, output_db. In parallel, we can per-calculate useful factors and pop into db so that backtester focuses only on backtesting and report gen.  
+- if possible: do not fetch data directly from the source popping into the backtester, instead we should first save the data locally and let the backetester fetch from locally. In this way, we maintain raw_input_db, backtester, output_db. In parallel, we can per-calculate useful factors and pop into db so that backtester focuses only on backtesting and report gen.  (separate ETL)
 
 
 # TODO:
@@ -42,4 +42,5 @@ python scripts/run_backtester.py
 - overlay with macro: i.e. risk-free rate
 - plot should follow a certain style
 - ruff, mypy, makefile
+- propoer logger
 
