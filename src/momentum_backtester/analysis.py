@@ -40,7 +40,7 @@ class Analysis:
         vol = self.annual_vol(r, periods_per_year, verbose=False)
         if vol == 0:
             return np.nan
-        sharpe = round(r.sum() / vol, 4)
+        sharpe = round(r.mean() * periods_per_year / vol, 4)
         if verbose:
             print("the Sharpe ratio is: ", sharpe)
         return sharpe
@@ -201,7 +201,7 @@ class Analysis:
         """
         w_ret = weights * (retoto_df_wide.shift(-1))
 
-        sector_date = sector_df_wide.loc[w_ret.index[0]]
+        sector_date = sector_df_wide.loc[w_ret.index[-1]]
         sector_stats = sector_date.value_counts()
         sector_ret_df = pd.DataFrame(index=w_ret.index, columns=sector_stats.index)
 
