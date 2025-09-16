@@ -74,11 +74,11 @@ def load_sp500_data_wrds(start_year: int, end_year: int) -> dict:
     sector_df_wide = price_df_long.pivot(index="date", columns="permno", values="gsector")
 
     # final ffill 
-    retoto_df_wide = retoto_df_wide.ffill(limit = 5)
-    retctc_df_wide = retctc_df_wide.ffill(limit = 5)
-    adjclose_df_wide = adjclose_df_wide.ffill(limit = 5)
-    adjopen_df_wide = adjopen_df_wide.ffill(limit = 5)
-    sector_df_wide = sector_df_wide.ffill(limit = 5)
+    retoto_df_wide = retoto_df_wide.ffill(limit = 3)
+    retctc_df_wide = retctc_df_wide.ffill(limit = 3)
+    adjclose_df_wide = adjclose_df_wide.ffill(limit = 3)
+    adjopen_df_wide = adjopen_df_wide.ffill(limit = 3)
+    sector_df_wide = sector_df_wide.ffill(limit = 3)
 
     return {
         "sp500_universes": sp500_universes,

@@ -52,7 +52,10 @@ class Backtester:
         # print(rebal_dates)
 
         signals = self.signal(self.adjclose_df_wide)
-        # print(signals.tail())
+
+        # make signals nan if the corresponding adjclose is nan
+        # the reason that adjclose_df_wide is nan could be due to delisting or the company no longer in sp500, in either case, the signal should be nan
+        signals = signals.where(self.adjclose_df_wide.notna(), np.nan)
 
         ranks = self.ranker(signals.loc[rebal_dates])
         # print(ranks.tail())

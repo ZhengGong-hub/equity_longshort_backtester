@@ -61,3 +61,35 @@ def long_short_top_bottom_sector_neutral(
         weights.loc[date] = w
 
     return weights
+
+
+def long_only(
+    ranks: pd.DataFrame,
+    sectors: pd.DataFrame,
+    top_pctg: int = 20,
+) -> pd.DataFrame:
+    weights = pd.DataFrame(0.0, index=ranks.index, columns=ranks.columns)
+    for date, row in ranks.iterrows():
+        valid = row.dropna()
+        if valid.empty:
+            continue
+        w = pd.Series(0.0, index=row.index)
+
+        sector_date = sectors.loc[date]
+        sector_stats = sector_date.value_counts()
+
+        top = []
+        for sector in sector_stats.index:
+            valid_names = valid[sector_date == sector]
+
+            nsmallest = int(top_pctg/100 * len(valid_names))
+
+            top.append(valid_names.nsmallest(nsmallest))
+
+        top = pd.concat(top)
+
+        if len(top) > 0:
+            w.loc[top.index] = 1.0 / len(top)
+        weights.loc[date] = w
+
+    return weights

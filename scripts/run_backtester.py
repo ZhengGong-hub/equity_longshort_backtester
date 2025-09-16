@@ -4,12 +4,12 @@ from momentum_backtester.adapters.sp500_github_adapter import load_tiny_sample, 
 from momentum_backtester.backtester import Backtester
 from momentum_backtester.signals import price_momentum
 from momentum_backtester.ranking import cross_sectional_rank
-from momentum_backtester.aggregation import long_short_top_bottom_sector_neutral
+from momentum_backtester.aggregation import long_short_top_bottom_sector_neutral, long_only
 from momentum_backtester.costs import turnover_costs
 from momentum_backtester.analysis import Analysis
 
 def main() -> None:
-    data = load_sp500_data_wrds(start_year=2022, end_year=2024)
+    data = load_sp500_data_wrds(start_year=2009, end_year=2024)
     sp500_universes = data["sp500_universes"]
     retoto_df_wide = data["retoto_df_wide"]
     retctc_df_wide = data["retctc_df_wide"]
@@ -28,13 +28,17 @@ def main() -> None:
             lookback_months=11, 
             skip=1),
         ranker=cross_sectional_rank,
-        aggregator=lambda ranks, sectors: long_short_top_bottom_sector_neutral(
+        # aggregator=lambda ranks, sectors: long_short_top_bottom_sector_neutral(
+        #     ranks, 
+        #     sectors, 
+        #     top_pctg=20, 
+        #     bottom_pctg=20),
+        aggregator=lambda ranks, sectors: long_only(
             ranks, 
             sectors, 
-            top_pctg=20, 
-            bottom_pctg=20),
+            top_pctg=20),
         costs=lambda w: turnover_costs(w, 10.0),
-        rebal_freq="M",
+        rebal_freq="D",
     )
     results = bt.run()
     print(results)
