@@ -184,7 +184,7 @@ class Analysis:
         plt.grid(True, linestyle="--", alpha=0.6)
         plt.savefig(os.path.join(self.output_dir, "rolling_beta.png"))
     
-
+    # TODO: fix to make checksum = 0
     def return_attr_sector(
         self,
         weights: pd.DataFrame,
@@ -205,6 +205,27 @@ class Analysis:
         sector_stats = sector_date.value_counts()
         sector_ret_df = pd.DataFrame(index=w_ret.index, columns=sector_stats.index)
 
+        # # -----
+        # sector_ret_df['new'] = 0.0
+        # for date, row in w_ret.iterrows():
+        #     valid = row.dropna()
+        #     if valid.empty:
+        #         continue
+            
+        #     # drop valid if the sector_df_wide is nan
+        #     valid = valid[sector_date.notna()]
+        #     w_ret_sum = valid.sum()
+        #     sector_ret_df.at[date, 'new'] = w_ret_sum  # Use .at to update the DataFrame value
+        #     print(sector_ret_df.loc[date])
+
+        # sector_ret_df['-gross_ret'] = -gross_returns
+        # sector_ret_df['check_sum'] = sector_ret_df.sum(axis=1) # just as an internal note, this column should be 0 at any date
+        # # print where the check_sum is not 0
+        # print(np.abs(sector_ret_df[sector_ret_df['check_sum'] >= 0.0005]))
+        # assert False
+        # -----
+
+
         for date, row in w_ret.iterrows():
             valid = row.dropna()
             if valid.empty:
@@ -215,11 +236,10 @@ class Analysis:
                 # sector_ret is sum up
                 sector_ret = valid_names.sum()
                 # print("sector_ret of sector: ", sector, " is: ", sector_ret)
-                sector_ret_df.loc[date][sector] = sector_ret
+                sector_ret_df.at[date, sector] = sector_ret
         
         sector_ret_df['-gross_ret'] = -gross_returns
         sector_ret_df['check_sum'] = sector_ret_df.sum(axis=1) # just as an internal note, this column should be 0 at any date
-        # print(sector_ret_df)
 
         total_sector_ret_df = sector_ret_df.sum(axis=0)
         if verbose:

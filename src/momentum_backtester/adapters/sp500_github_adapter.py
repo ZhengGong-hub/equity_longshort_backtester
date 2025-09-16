@@ -78,7 +78,7 @@ def load_sp500_data_wrds(start_year: int, end_year: int) -> dict:
     retctc_df_wide = retctc_df_wide.ffill(limit = 3)
     adjclose_df_wide = adjclose_df_wide.ffill(limit = 3)
     adjopen_df_wide = adjopen_df_wide.ffill(limit = 3)
-    sector_df_wide = sector_df_wide.ffill(limit = 3)
+    sector_df_wide = sector_df_wide.ffill() # important to not use limit here
 
     return {
         "sp500_universes": sp500_universes,

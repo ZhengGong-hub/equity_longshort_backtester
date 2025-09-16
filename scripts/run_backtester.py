@@ -9,7 +9,7 @@ from momentum_backtester.costs import turnover_costs
 from momentum_backtester.analysis import Analysis
 
 def main() -> None:
-    data = load_sp500_data_wrds(start_year=2009, end_year=2024)
+    data = load_sp500_data_wrds(start_year=2023, end_year=2024)
     sp500_universes = data["sp500_universes"]
     retoto_df_wide = data["retoto_df_wide"]
     retctc_df_wide = data["retctc_df_wide"]
@@ -28,15 +28,15 @@ def main() -> None:
             lookback_months=11, 
             skip=1),
         ranker=cross_sectional_rank,
-        # aggregator=lambda ranks, sectors: long_short_top_bottom_sector_neutral(
-        #     ranks, 
-        #     sectors, 
-        #     top_pctg=20, 
-        #     bottom_pctg=20),
-        aggregator=lambda ranks, sectors: long_only(
+        aggregator=lambda ranks, sectors: long_short_top_bottom_sector_neutral(
             ranks, 
             sectors, 
-            top_pctg=20),
+            top_pctg=20, 
+            bottom_pctg=20),
+        # aggregator=lambda ranks, sectors: long_only(
+        #     ranks, 
+        #     sectors, 
+        #     top_pctg=20),
         costs=lambda w: turnover_costs(w, 10.0),
         rebal_freq="D",
     )
@@ -52,16 +52,16 @@ def main() -> None:
 
     # start analysis
     analysis = Analysis(output_dir="output")
-    analysis.cagr(results["net_returns"], 252)
-    analysis.annual_vol(results["net_returns"], 252)
-    analysis.sharpe(results["net_returns"], 0.04, 252)
-    analysis.max_drawdown(results["net_returns"])
-    analysis.nav_chart(results["gross_returns"], results["net_returns"], incl_spy=True, spy_daily=data["spy_daily"])
-    analysis.spy_chart(data["spy_daily"])
-    analysis.against_spy(results["net_returns"], data["spy_daily"])
-    analysis.rolling_beta(results["net_returns"], data["spy_daily"])
+    # analysis.cagr(results["net_returns"], 252)
+    # analysis.annual_vol(results["net_returns"], 252)
+    # analysis.sharpe(results["net_returns"], 0.04, 252)
+    # analysis.max_drawdown(results["net_returns"])
+    # analysis.nav_chart(results["gross_returns"], results["net_returns"], incl_spy=True, spy_daily=data["spy_daily"])
+    # analysis.spy_chart(data["spy_daily"])
+    # analysis.against_spy(results["net_returns"], data["spy_daily"])
+    # analysis.rolling_beta(results["net_returns"], data["spy_daily"])
     analysis.return_attr_sector(results["weights"], data["sector_df_wide"], results["retoto_df_wide"], results["gross_returns"])
-    analysis.total_turnover(results["weights"])
+    # analysis.total_turnover(results["weights"])
 
 if __name__ == "__main__":
     main()

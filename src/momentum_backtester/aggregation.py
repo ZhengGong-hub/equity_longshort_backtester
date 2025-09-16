@@ -31,6 +31,19 @@ def long_short_top_bottom_sector_neutral(
     top_pctg: int = 20,
     bottom_pctg: int = 20,
 ) -> pd.DataFrame:
+    """
+    Construct a sector-neutral long-short portfolio by selecting the top and bottom
+    percentage of stocks within each sector based on their cross-sectional ranks.
+
+    For each date:
+        - Within each sector, select the top `top_pctg` percent (lowest rank values)
+          and bottom `bottom_pctg` percent (highest rank values) of stocks.
+        - Assign equal positive weights to the top stocks and equal negative weights
+          to the bottom stocks, such that the sum of long and short weights are each
+          normalized to 1 and -1, respectively, across all selected stocks.
+        - Stocks not in the top or bottom groups receive zero weight.
+        - The process is repeated independently for each sector, ensuring sector neutrality.
+    """
     weights = pd.DataFrame(0.0, index=ranks.index, columns=ranks.columns)
     for date, row in ranks.iterrows():
         valid = row.dropna()
@@ -39,10 +52,12 @@ def long_short_top_bottom_sector_neutral(
         w = pd.Series(0.0, index=row.index)
 
         sector_date = sectors.loc[date]
+
         sector_stats = sector_date.value_counts()
+        sector_list = sector_stats.index
 
         top, bot = [], []
-        for sector in sector_stats.index:
+        for sector in sector_list:
             valid_names = valid[sector_date == sector]
 
             nsmallest = int(top_pctg/100 * len(valid_names))
